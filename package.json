@@ -1,0 +1,9 @@
+{
+  "name": "superagent-public-chat",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Public chat website wired to the Base44 Superagent API — anyone can talk to the agent without a Base44 account.",
+  "scripts": {
+    "start": "npx serve ."
+  }
+}

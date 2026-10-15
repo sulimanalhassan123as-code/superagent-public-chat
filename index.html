@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Chat with Superagent AI</title>
+<meta name="description" content="Talk to Superagent — your personal AI assistant for security, coding, and research. No account needed.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">⚡</div>
+      <div>
+        <h1>Superagent</h1>
+        <p class="status"><span class="dot" id="statusDot"></span><span id="statusText">connecting…</span></p>
+      </div>
+    </div>
+    <button class="reset-btn" id="resetBtn" title="Start a fresh conversation">↻ New chat</button>
+  </header>
+
+  <main class="messages" id="messages">
+    <div class="msg ai">
+      <div class="avatar">⚡</div>
+      <div class="bubble">
+        <b>Assalamu alaikum!</b> 👋<br><br>
+        I'm <b>Superagent</b> — a real AI agent that does security testing, coding, debugging, phone tracking research, and deep web investigation.<br><br>
+        Ask me anything. No sign-up, no account. Just type.
+      </div>
+    </div>
+  </main>
+
+  <div class="typing" id="typing" hidden>
+    <div class="avatar small">⚡</div>
+    <div class="bubble typing-bubble"><span></span><span></span><span></span></div>
+  </div>
+
+  <footer class="inputbar">
+    <form id="chatForm" class="input-row">
+      <input id="msgInput" type="text" placeholder="Type your message…" autocomplete="off" maxlength="2000" required>
+      <button type="submit" id="sendBtn" aria-label="Send">➤</button>
+    </form>
+    <p class="hint">Powered by the Base44 Superagent API • messages answered by a live AI agent</p>
+  </footer>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
