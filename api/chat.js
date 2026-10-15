@@ -25,12 +25,6 @@ function rateLimited(ip) {
 }
 
 /* ---------- helpers ---------- */
-const json = (code, body) => ({
-  statusCode: code,
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(body),
-});
-
 function getApiKey() {
   return process.env.AGENT_API_KEY || "";
 }
@@ -81,7 +75,7 @@ function extractReply(data) {
 }
 
 /* ---------- handler ---------- */
-export default async function handler(req) {
+module.exports = async function handler(req, res) {
   const ip =
     (req.headers && (req.headers["x-forwarded-for"] || req.headers["x-real-ip"])) ||
     "unknown";
@@ -89,22 +83,22 @@ export default async function handler(req) {
 
   /* health check */
   if (req.method === "GET") {
-    if (!getApiKey()) return json(200, { ok: false, reason: "no_key" });
-    return json(200, { ok: true });
+    if (!getApiKey()) return res.status(200).json({ ok: false, reason: "no_key" });
+    return res.status(200).json({ ok: true });
   }
 
-  if (req.method !== "POST") return json(405, { error: "Method not allowed" });
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   /* config check */
   if (!getApiKey()) {
-    return json(503, {
+    return res.status(503).json({
       error: "Agent API key is not configured yet. The owner will activate this shortly.",
     });
   }
 
   /* rate limit */
   if (rateLimited(ipKey)) {
-    return json(429, {
+    return res.status(429).json({
       error: "You're sending messages too fast. Please wait a few minutes.",
     });
   }
@@ -112,14 +106,14 @@ export default async function handler(req) {
   /* input validation */
   let body;
   try { body = JSON.parse(req.body || "{}"); } catch {
-    return json(400, { error: "Invalid request body" });
+    return res.status(400).json({ error: "Invalid request body" });
   }
   const message = String(body.message || "").trim();
   let conversationId = String(body.conversationId || "").trim() || null;
 
-  if (!message) return json(400, { error: "Message is empty" });
+  if (!message) return res.status(400).json({ error: "Message is empty" });
   if (message.length > 2000) {
-    return json(400, { error: "Message too long (max 2000 characters)" });
+    return res.status(400).json({ error: "Message too long (max 2000 characters)" });
   }
 
   try {
@@ -130,7 +124,7 @@ export default async function handler(req) {
         body: JSON.stringify({ title: "Public website chat" }),
       });
       if (created.status >= 400) {
-        return json(502, {
+        return res.status(502).json({
           error: "Could not start a conversation with the agent. Please try again.",
         });
       }
@@ -158,19 +152,19 @@ export default async function handler(req) {
           });
           if (retry.status < 400) {
             const reply = extractReply(retry.data);
-            if (reply) return json(200, { reply, conversationId: freshId });
+            if (reply) return res.status(200).json({ reply, conversationId: freshId });
           }
         }
       }
-      return json(502, { error: "The agent could not be reached. Please try again." });
+      return res.status(502).json({ error: "The agent could not be reached. Please try again." });
     }
 
     const reply = extractReply(sent.data);
     if (!reply) {
-      return json(502, { error: "The agent replied in an unexpected format. Please try again." });
+      return res.status(502).json({ error: "The agent replied in an unexpected format. Please try again." });
     }
-    return json(200, { reply, conversationId });
+    return res.status(200).json({ reply, conversationId });
   } catch (err) {
-    return json(502, { error: "Connection to the agent failed. Please try again." });
+    return res.status(502).json({ error: "Connection to the agent failed. Please try again." });
   }
 }
