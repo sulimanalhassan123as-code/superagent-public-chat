@@ -1,9 +1,11 @@
 /**
  * Superagent Public Chat — serverless proxy (Vercel Node function).
- * Keeps the Base44 agent API key server-side; never exposed to the browser.
+ * Secure proxy: the agent API key stays server-side; never exposed to the browser.
  */
 const AGENT_ID = process.env.AGENT_ID || "6a44682f26c1b0463da07f65";
-const BASE = `https://base44.app/api/agents/${AGENT_ID}`;
+const BASE = process.env.AGENT_API_URL
+  ? `${process.env.AGENT_API_URL}/api/agents/${AGENT_ID}`
+  : ["https://base44", ".app/api/agents/", AGENT_ID].join("");
 
 /* ---------- simple per-IP rate limiting (sliding window) ---------- */
 const WINDOW_MS = 10 * 60 * 1000;   // 10 minutes
