@@ -35,7 +35,7 @@ async function agentFetch(path, options = {}) {
   const res = await fetch(`${BASE}${path}`, {
     ...options,
     headers: {
-      "api_key": getApiKey(),
+      "Authorization": "Bearer " + getApiKey(),
       "Content-Type": "application/json",
       ...(options.headers || {}),
     },
