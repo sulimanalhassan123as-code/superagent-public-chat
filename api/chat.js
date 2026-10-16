@@ -76,6 +76,17 @@ function extractReply(data) {
   return null;
 }
 
+/* ---------- robust body reader ---------- */
+function readRawBody(req) {
+  if (req.body) return Promise.resolve(typeof req.body === "string" ? req.body : JSON.stringify(req.body));
+  return new Promise((resolve, reject) => {
+    let data = "";
+    req.on("data", (c) => (data += c));
+    req.on("end", () => resolve(data));
+    req.on("error", reject);
+  });
+}
+
 /* ---------- handler ---------- */
 module.exports = async function handler(req, res) {
   const ip =
@@ -107,7 +118,7 @@ module.exports = async function handler(req, res) {
 
   /* input validation */
   let body;
-  try { body = JSON.parse(req.body || "{}"); } catch {
+  try { body = JSON.parse((await readRawBody(req)) || "{}"); } catch {
     return res.status(400).json({ error: "Invalid request body" });
   }
   const message = String(body.message || "").trim();
