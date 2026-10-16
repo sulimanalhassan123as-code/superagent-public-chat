@@ -60,6 +60,7 @@ function extractConversationId(data) {
 function extractReply(data) {
   if (!data) return null;
   const candidates = [
+    data.content,
     data.message?.content,
     data.message?.text,
     data.reply,
